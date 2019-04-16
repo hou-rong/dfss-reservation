@@ -16,19 +16,18 @@ func main() {
 		sevenDaysLater := today.AddDate(0, 0, 6)
 		dating := sevenDaysLater.Format("2006-01-02")
 		fmt.Println(now, "时间 OK，开始预约 7 天后的车，日期: ", dating)
+
+		// 先登录
 		timestamp, checksum, token := api.Login()
-		api.Reservation(timestamp, checksum, token, dating, "01", "02")
+		for i := 0; i < 9; i++ {
+			// 获取最佳方案
+			bestPlan := api.GetBestPlan(timestamp, checksum, token, dating)
+			if bestPlan != nil {
+				// 如果有最佳方案，则下订单
+				api.Reservation(timestamp, checksum, token, dating, bestPlan.TrainingTimeSlotId, bestPlan.LessonID)
+			} else {
+				fmt.Println(now, "今天没的选了，改天吧", dating)
+			}
+		}
 	}
-	//if today.Weekday() == 0 || now.Weekday() == 6 {
-	//	// 如果是周日或者周六：周日预定下周六的车，周六预约下周日的车
-	//
-	//	// 7 天后日期
-	//	sevenDaysLater := today.AddDate(0, 0, 6)
-	//	dating := sevenDaysLater.Format("20060102")
-	//	fmt.Println(now, "时间 OK，开始预约 7 天后的车，日期: ", dating)
-	//	timestamp, checksum, token := api.Login()
-	//	api.Reservation(timestamp, checksum, token, dating)
-	//} else {
-	//	fmt.Println(now, "时间不 OK，等周六日再干吧")
-	//}
 }
